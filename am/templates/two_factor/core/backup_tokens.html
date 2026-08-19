@@ -1,0 +1,53 @@
+{% extends "two-factor/_base.html" %}
+{% load i18n %}
+
+{% block title %}AM Media - Códigos de Respaldo{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h3 class="fw-bold" style="color: #f4d58d;">
+        <i class="fas fa-key me-2"></i>Códigos de Respaldo
+    </h3>
+    <p style="color: #708d81;">Guarda estos códigos en un lugar seguro</p>
+</div>
+
+<div class="alert mb-4" style="background: rgba(191, 6, 3, 0.1); border: 1px solid rgba(191, 6, 3, 0.3); color: #bf0603;">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <strong>Importante:</strong> Estos códigos solo se muestran una vez. Guárdalos en un lugar seguro.
+</div>
+
+{% if backup_tokens %}
+    <div class="mb-4">
+        <div class="p-3" style="background: rgba(0, 20, 39, 0.5); border-radius: 12px; border: 1px solid rgba(244, 213, 141, 0.3);">
+            {% for token in backup_tokens %}
+                <div class="d-flex justify-content-between align-items-center py-2 px-3 mb-2" style="background: rgba(244, 213, 141, 0.1); border-radius: 8px;">
+                    <code style="color: #f4d58d; font-size: 1.1rem;">{{ token }}</code>
+                    <button class="btn btn-sm" onclick="copyToClipboard('{{ token }}')" style="color: #708d81;">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+
+<div class="d-grid mb-3">
+    <a href="{% url 'home' %}" class="btn btn-primary btn-lg">
+        <i class="fas fa-home me-2"></i>Ir al Inicio
+    </a>
+</div>
+
+<div class="text-center">
+    <small style="color: #708d81;">
+        Cada código solo puede usarse una vez como respaldo
+    </small>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Código copiado al portapapeles');
+    });
+}
+</script>
+{% endblock %}

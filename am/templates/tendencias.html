@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tendencias - AM Media</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/am-media.css' %}">
+    <link rel="stylesheet" href="{% static 'css/am-effects.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-am">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">AM Media</a>
+            <div class="navbar-nav mx-auto">
+                <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home me-1"></i>Inicio</a>
+                <a class="nav-link active" href="{% url 'tendencias' %}"><i class="fas fa-fire me-1"></i>Tendencias</a>
+                <a class="nav-link" href="{% url 'buscar_usuarios' %}"><i class="fas fa-search me-1"></i>Buscar</a>
+                <a class="nav-link" href="{% url 'mis_amigos' %}"><i class="fas fa-users me-1"></i>Amigos</a>
+                <a class="nav-link" href="{% url 'solicitudes_amistad' %}"><i class="fas fa-user-plus me-1"></i>Solicitudes</a>
+                <a class="nav-link" href="{% url 'ver_perfil' user.username %}"><i class="fas fa-user me-1"></i>Mi Perfil</a>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                        {% if user.perfil.foto %}
+                            <img src="{{ user.perfil.foto.url }}" class="rounded-circle me-2" width="32" height="32" alt="Mi avatar">
+                        {% else %}
+                            <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: #001427; color: white; font-weight: bold; font-size: 0.8rem;">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <span>{{ user.get_full_name|default:user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'ver_perfil' user.username %}"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
+                        <li><a class="dropdown-item" href="{% url 'editar_perfil' %}"><i class="fas fa-edit me-2"></i>Editar Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card card-am mb-4 fade-in-up">
+                        <div class="card-header">
+                            <h4 class="mb-0">
+                                <i class="fas fa-fire me-2 text-danger"></i>Contenido en Tendencia
+                            </h4>
+                            <p class="mb-0 mt-2 text-muted">Las publicaciones más populares de la comunidad</p>
+                        </div>
+                    </div>
+
+                    {% if publicaciones %}
+                        {% for publicacion in publicaciones %}
+                            <div class="card post-card card-am fade-in-up hover-lift">
+                                <div class="card-body">
+                                    <div class="post-header">
+                                        <div class="d-flex align-items-center flex-grow-1">
+                                            {% if publicacion.autor.perfil.foto %}
+                                                <img src="{{ publicacion.autor.perfil.foto.url }}" class="avatar avatar-am" alt="Avatar">
+                                            {% else %}
+                                                <div class="avatar-placeholder avatar-am">
+                                                    {{ publicacion.autor.username|first|upper }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="ms-3">
+                                                <h6 class="mb-0">
+                                                    <a href="{% url 'ver_perfil' publicacion.autor.username %}" class="post-author">
+                                                        {{ publicacion.autor.get_full_name|default:publicacion.autor.username }}
+                                                    </a>
+                                                </h6>
+                                                <small class="post-time"><i class="fas fa-clock me-1"></i>{{ publicacion.fecha_creacion }}</small>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-danger me-2">
+                                                <i class="fas fa-fire me-1"></i>Popular
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="post-content">{{ publicacion.contenido }}</p>
+                                    
+                                    {% if publicacion.imagen %}
+                                        <img src="{{ publicacion.imagen.url }}" class="post-image img-fluid" alt="Imagen de publicación">
+                                    {% endif %}
+                                    
+                                    <div class="post-actions">
+                                        <div>
+                                            <button class="reaction-btn like-btn" data-post-id="{{ publicacion.id }}">
+                                                <i class="fas fa-heart{% if publicacion.reacciones.all|length > 0 %}{% for reaccion in publicacion.reacciones.all %}{% if reaccion.usuario == user %} text-danger{% endif %}{% endfor %}{% endif %}"></i> 
+                                                <span class="like-count">{{ publicacion.reacciones.count }}</span>
+                                            </button>
+                                        </div>
+                                        <small class="text-muted"><i class="fas fa-comment me-1"></i>{{ publicacion.comentarios.count }} comentarios</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="card card-am fade-in-up">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-fire fa-4x text-muted mb-4"></i>
+                                <h5 class="text-muted mb-3">No hay contenido en tendencia</h5>
+                                <p class="text-muted mb-4">Aún no hay publicaciones populares. ¡Sé el primero en crear contenido viral!</p>
+                                <a href="{% url 'home' %}" class="btn btn-am-primary">
+                                    <i class="fas fa-plus me-2"></i>Crear Publicación
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animaciones
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+
+            // Manejar likes
+            document.querySelectorAll('.like-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const postId = this.dataset.postId;
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                    
+                    fetch(`/reaccionar/${postId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'tipo=like'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const icon = this.querySelector('i');
+                        const count = this.querySelector('.like-count');
+                        
+                        if (data.liked) {
+                            icon.classList.add('text-danger');
+                        } else {
+                            icon.classList.remove('text-danger');
+                        }
+                        
+                        count.textContent = data.total_likes;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

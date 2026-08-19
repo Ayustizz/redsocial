@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil - AM Media</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/am-media.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-am">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">AM Media</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home me-1"></i>Inicio</a>
+                <a class="nav-link" href="{% url 'ver_perfil' user.username %}"><i class="fas fa-user me-1"></i>Mi Perfil</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card fade-in-up">
+                        <div class="card-header">
+                            <h4><i class="fas fa-user-edit me-2"></i>Editar Perfil</h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.biografia.id_for_label }}" class="form-label">
+                                                <i class="fas fa-quote-left me-1"></i>Biografía
+                                            </label>
+                                            {{ form.biografia }}
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="{{ form.enlace.id_for_label }}" class="form-label">
+                                                <i class="fas fa-link me-1"></i>Enlace personal
+                                            </label>
+                                            {{ form.enlace }}
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="{{ form.ubicacion.id_for_label }}" class="form-label">
+                                                <i class="fas fa-map-marker-alt me-1"></i>Ubicación
+                                            </label>
+                                            {{ form.ubicacion }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.foto.id_for_label }}" class="form-label">
+                                                <i class="fas fa-camera me-1"></i>Foto de perfil
+                                            </label>
+                                            {{ form.foto }}
+                                            {% if user.perfil.foto %}
+                                                <div class="mt-2">
+                                                    <p class="small text-muted">Foto actual:</p>
+                                                    <img src="{{ user.perfil.foto.url }}" class="img-thumbnail" style="max-width: 150px; border-radius: 12px;">
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="{{ form.fecha_nacimiento.id_for_label }}" class="form-label">
+                                                <i class="fas fa-birthday-cake me-1"></i>Fecha de nacimiento
+                                            </label>
+                                            {{ form.fecha_nacimiento }}
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="{{ form.privacidad.id_for_label }}" class="form-label">
+                                                <i class="fas fa-shield-alt me-1"></i>Privacidad del perfil
+                                            </label>
+                                            {{ form.privacidad }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                                    <a href="{% url 'home' %}" class="btn btn-secondary me-md-2">
+                                        <i class="fas fa-times me-1"></i>Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>Guardar Cambios
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

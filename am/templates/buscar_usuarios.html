@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Usuarios - AM Media</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/am-media.css' %}">
+    <link rel="stylesheet" href="{% static 'css/am-effects.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-am">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">AM Media</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home me-1"></i>Inicio</a>
+                <a class="nav-link active" href="{% url 'buscar_usuarios' %}"><i class="fas fa-search me-1"></i>Buscar</a>
+                <a class="nav-link" href="{% url 'mis_amigos' %}"><i class="fas fa-users me-1"></i>Amigos</a>
+                <a class="nav-link" href="{% url 'solicitudes_amistad' %}"><i class="fas fa-user-plus me-1"></i>Solicitudes</a>
+                <a class="nav-link" href="{% url 'ver_perfil' user.username %}"><i class="fas fa-user me-1"></i>Mi Perfil</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card card-am mb-4 fade-in-up">
+                        <div class="card-header">
+                            <h4 class="text-am-gradient mb-0">
+                                <i class="fas fa-search me-2"></i>Buscar Usuarios
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <form method="get">
+                                <div class="input-group">
+                                    {{ form.query }}
+                                    <button class="btn btn-am-primary" type="submit">
+                                        <i class="fas fa-search me-1"></i>Buscar
+                                    </button>
+                                </div>
+                                <small class="text-muted mt-2 d-block">
+                                    <i class="fas fa-info-circle me-1"></i>Busca por nombre, apellido, nombre de usuario o email
+                                </small>
+                            </form>
+                        </div>
+                    </div>
+
+                    {% if usuarios %}
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="fas fa-users me-1"></i>Se encontraron {{ usuarios|length }} usuario{{ usuarios|length|pluralize }}
+                            </small>
+                        </div>
+                        <div class="row">
+                            {% for usuario in usuarios %}
+                                <div class="col-md-6 mb-4">
+                                    <div class="card card-am fade-in-up hover-lift">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center">
+                                                {% if usuario.perfil.foto %}
+                                                    <img src="{{ usuario.perfil.foto.url }}" class="avatar avatar-am me-3" alt="Avatar de {{ usuario.username }}">
+                                                {% else %}
+                                                    <div class="avatar-placeholder avatar-am me-3">
+                                                        {{ usuario.username|first|upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-1 fw-bold">{{ usuario.get_full_name|default:usuario.username }}</h6>
+                                                    <p class="text-muted mb-1">
+                                                        <i class="fas fa-at me-1"></i>{{ usuario.username }}
+                                                    </p>
+                                                    {% if usuario.perfil.ubicacion %}
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-map-marker-alt me-1"></i>{{ usuario.perfil.ubicacion }}
+                                                        </small>
+                                                    {% endif %}
+                                                    {% if usuario.perfil.biografia %}
+                                                        <p class="text-muted small mt-2 mb-0">{{ usuario.perfil.biografia|truncatechars:80 }}</p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 d-flex gap-2">
+                                                <a href="{% url 'ver_perfil' usuario.username %}" class="btn btn-am-primary btn-sm flex-fill">
+                                                    <i class="fas fa-eye me-1"></i>Ver Perfil
+                                                </a>
+                                                <a href="{% url 'enviar_solicitud_amistad' usuario.username %}" class="btn btn-am-accent btn-sm">
+                                                    <i class="fas fa-user-plus me-1"></i>Agregar
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elif request.GET.query %}
+                        <div class="card card-am fade-in-up">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-search fa-4x text-muted mb-4"></i>
+                                <h5 class="text-muted mb-3">No se encontraron usuarios</h5>
+                                <p class="text-muted mb-4">No hay usuarios que coincidan con "{{ request.GET.query }}"</p>
+                                <p class="text-muted">Intenta con otros términos de búsqueda</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card card-am fade-in-up">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-users fa-4x text-muted mb-4"></i>
+                                <h5 class="text-muted mb-3">Encuentra nuevos amigos</h5>
+                                <p class="text-muted mb-4">Usa el buscador para encontrar personas y conectar con ellas</p>
+                                <p class="text-muted">Puedes buscar por nombre, apellido, nombre de usuario o email</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

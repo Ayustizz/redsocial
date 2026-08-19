@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AM Media - Verificación{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/am-media.css' %}">
+    <link rel="stylesheet" href="{% static 'css/am-effects.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="min-vh-100 d-flex align-items-center" style="background: #001427;">
+        <div class="container">
+            <div class="row align-items-center justify-content-center">
+                <div class="col-lg-5 text-center mb-5 mb-lg-0">
+                    <div class="fade-in-up">
+                        <h1 class="display-2 fw-bold mb-4" style="color: #f4d58d;">
+                            AM Media
+                        </h1>
+                        <p class="lead mb-4" style="color: #708d81;">
+                            Verificación de seguridad
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-5">
+                    <div class="card fade-in-up" style="background: white; border: none; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                        <div class="card-body p-5">
+                            {% block content %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'inicio' %}" class="text-decoration-none" style="color: #f4d58d;">
+                            <i class="fas fa-arrow-left me-1"></i>Volver al inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+    </script>
+    
+    <style>
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+        
+        .form-control {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 0.75rem;
+            color: #001427;
+        }
+        
+        .form-control:focus {
+            border-color: #f4d58d;
+            box-shadow: 0 0 0 3px rgba(244, 213, 141, 0.2);
+        }
+        
+        .form-label {
+            color: #001427;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background: #001427;
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        
+        .btn-primary:hover {
+            background: #708d81;
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        h2, h3, h4 {
+            color: #001427;
+        }
+        
+        p {
+            color: #708d81;
+        }
+        
+        .alert {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</body>
+</html>

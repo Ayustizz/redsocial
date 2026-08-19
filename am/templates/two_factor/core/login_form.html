@@ -1,0 +1,52 @@
+{% extends "two-factor/_base.html" %}
+{% load i18n %}
+
+{% block title %}AM Media - Verificación 2FA{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h3 class="fw-bold" style="color: #f4d58d;">
+        <i class="fas fa-shield-alt me-2"></i>Verificación de Seguridad
+    </h3>
+    <p style="color: #708d81;">Ingresa el código de tu aplicación de autenticación</p>
+</div>
+
+<form method="post" action="">
+    {% csrf_token %}
+    {{ wizard.management_form }}
+    
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger mb-3">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+    
+    <div class="mb-4">
+        <label for="{{ form.otp_token.id_for_label }}" class="form-label">
+            <i class="fas fa-key me-1"></i>Código de Verificación
+        </label>
+        {{ form.otp_token }}
+        {% if form.otp_token.errors %}
+            <div class="text-danger small mt-1">{{ form.otp_token.errors }}</div>
+        {% endif %}
+        <div class="form-text" style="color: #708d81;">
+            Ingresa el código de 6 dígitos de tu aplicación de autenticación
+        </div>
+    </div>
+    
+    <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fas fa-check me-2"></i>Verificar
+        </button>
+    </div>
+    
+    <div class="text-center">
+        <small style="color: #708d81;">
+            ¿Problemas con el código? 
+            <a href="#" class="text-decoration-none fw-bold" style="color: #f4d58d;">
+                Usar código de respaldo
+            </a>
+        </small>
+    </div>
+</form>
+{% endblock %}

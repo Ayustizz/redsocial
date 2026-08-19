@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperación de Contraseña</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: #001427;
+            color: #f4d58d;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+        }
+        .btn {
+            display: inline-block;
+            background: #001427;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AM Media</h1>
+        <h2>Recuperación de Contraseña</h2>
+    </div>
+    
+    <div class="content">
+        <p>Hola {{ user.first_name }},</p>
+        
+        <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta en AM Media.</p>
+        
+        <p>Si solicitaste este cambio, haz clic en el siguiente enlace para crear una nueva contraseña:</p>
+        
+        <p style="text-align: center;">
+            <a href="http://{{ domain }}/restablecer-contrasena/{{ token }}/" class="btn">
+                Restablecer Contraseña
+            </a>
+        </p>
+        
+        <p><strong>Este enlace expirará en 1 hora por seguridad.</strong></p>
+        
+        <p>Si no solicitaste este cambio, puedes ignorar este correo. Tu contraseña permanecerá sin cambios.</p>
+        
+        <p>Por tu seguridad, nunca compartas este enlace con nadie.</p>
+        
+        <p>Saludos,<br>
+        El equipo de AM Media</p>
+    </div>
+    
+    <div class="footer">
+        <p>Este es un correo automático, por favor no respondas a este mensaje.</p>
+    </div>
+</body>
+</html>

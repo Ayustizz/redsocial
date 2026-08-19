@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ perfil_usuario.get_full_name|default:perfil_usuario.username }} - AM Media</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/am-media.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-am">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">AM Media</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home me-1"></i>Inicio</a>
+                <a class="nav-link" href="{% url 'buscar_usuarios' %}"><i class="fas fa-search me-1"></i>Buscar</a>
+                <a class="nav-link" href="{% url 'mis_amigos' %}"><i class="fas fa-users me-1"></i>Amigos</a>
+                <a class="nav-link" href="{% url 'solicitudes_amistad' %}"><i class="fas fa-user-plus me-1"></i>Solicitudes</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        {% if perfil.foto %}
+                            <img src="{{ perfil.foto.url }}" class="rounded-circle mb-3" width="150" height="150" style="border: 4px solid var(--primary-color); object-fit: cover;">
+                        {% else %}
+                            <div class="mx-auto mb-3" style="width: 150px; height: 150px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 3rem; border: 4px solid var(--primary-color);">
+                                {{ perfil_usuario.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <h4>{{ perfil_usuario.get_full_name|default:perfil_usuario.username }}</h4>
+                        <p class="text-muted">@{{ perfil_usuario.username }}</p>
+                        
+                        <div class="d-flex justify-content-center mb-3">
+                            <div class="text-center me-4">
+                                <h5 class="mb-0 fw-bold" style="color: #001427;">{{ publicaciones|length }}</h5>
+                                <small class="text-muted">Publicaciones</small>
+                            </div>
+                            <div class="text-center">
+                                <h5 class="mb-0 fw-bold" style="color: #001427;">{{ total_amigos|default:0 }}</h5>
+                                <small class="text-muted">Amigos</small>
+                            </div>
+                        </div>
+                        
+                        {% if perfil.biografia %}
+                            <p>{{ perfil.biografia }}</p>
+                        {% endif %}
+                        
+                        {% if perfil.ubicacion %}
+                            <p><i class="fas fa-map-marker-alt"></i> {{ perfil.ubicacion }}</p>
+                        {% endif %}
+                        
+                        {% if perfil.enlace %}
+                            <p><a href="{{ perfil.enlace }}" target="_blank">{{ perfil.enlace }}</a></p>
+                        {% endif %}
+                        
+                        {% if not es_propio_perfil %}
+                            <div class="mt-3">
+                                {% if es_amigo %}
+                                    <span class="badge bg-success">Amigos</span>
+                                {% elif solicitud_pendiente %}
+                                    <span class="badge bg-warning">Solicitud enviada</span>
+                                {% else %}
+                                    <a href="{% url 'enviar_solicitud_amistad' perfil_usuario.username %}" class="btn btn-primary btn-sm">Agregar amigo</a>
+                                {% endif %}
+                                <a href="{% url 'reportar_usuario' perfil_usuario.username %}" class="btn btn-warning btn-sm">Reportar</a>
+                                <a href="{% url 'bloquear_usuario' perfil_usuario.username %}" class="btn btn-danger btn-sm">Bloquear</a>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'editar_perfil' %}" class="btn btn-primary">Editar Perfil</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="card card-am mb-4">
+                    <div class="card-header">
+                        <h4 class="mb-0">
+                            <i class="fas fa-newspaper me-2"></i>Publicaciones
+                            <span class="badge bg-primary ms-2">{{ publicaciones|length }}</span>
+                        </h4>
+                    </div>
+                </div>
+                {% if publicaciones %}
+                    {% for publicacion in publicaciones %}
+                    <div class="card mb-3 post-card">
+                        <div class="card-body">
+                            <div class="post-header">
+                                <div class="d-flex align-items-center flex-grow-1">
+                                    {% if publicacion.autor.perfil.foto %}
+                                        <img src="{{ publicacion.autor.perfil.foto.url }}" class="avatar me-3">
+                                    {% else %}
+                                        <div class="avatar-placeholder me-3">
+                                            {{ publicacion.autor.username|first|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <h6 class="post-author mb-0">{{ publicacion.autor.get_full_name|default:publicacion.autor.username }}</h6>
+                                        <small class="post-time">{{ publicacion.fecha_creacion }}</small>
+                                    </div>
+                                </div>
+                                {% if es_propio_perfil %}
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{% url 'editar_publicacion' publicacion.id %}">
+                                                <i class="fas fa-edit me-2"></i>Editar
+                                            </a></li>
+                                            <li><a class="dropdown-item text-danger" href="{% url 'eliminar_publicacion' publicacion.id %}">
+                                                <i class="fas fa-trash me-2"></i>Eliminar
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="post-content">
+                                {{ publicacion.contenido }}
+                            </div>
+                            {% if publicacion.imagen %}
+                                <img src="{{ publicacion.imagen.url }}" class="post-image img-fluid" alt="Imagen de publicación">
+                            {% endif %}
+                            <div class="post-actions">
+                                <div class="d-flex align-items-center">
+                                    <span class="text-muted me-3">
+                                        <i class="fas fa-heart me-1"></i>{{ publicacion.reacciones.count }}
+                                    </span>
+                                    <span class="text-muted">
+                                        <i class="fas fa-comment me-1"></i>{{ publicacion.comentarios.count }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="card card-am">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-file-alt fa-4x text-muted mb-4"></i>
+                            <h5 class="text-muted mb-3">No hay publicaciones</h5>
+                            <p class="text-muted">{% if es_propio_perfil %}Aún no has publicado nada. ¡Comparte tu primer post!{% else %}Este usuario no ha publicado nada aún.{% endif %}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

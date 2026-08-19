@@ -1,0 +1,60 @@
+{% extends "two-factor/_base.html" %}
+{% load i18n %}
+
+{% block title %}AM Media - Configurar 2FA{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h3 class="fw-bold" style="color: #f4d58d;">
+        <i class="fas fa-cog me-2"></i>Configurar Autenticación 2FA
+    </h3>
+    <p style="color: #708d81;">Configura la verificación en dos pasos para mayor seguridad</p>
+</div>
+
+{% if qr_url %}
+    <div class="text-center mb-4">
+        <div class="p-3" style="background: white; border-radius: 12px; display: inline-block;">
+            <img src="{{ qr_url }}" alt="Código QR" class="img-fluid">
+        </div>
+        <p class="mt-2" style="color: #708d81;">
+            Escanea este código QR con tu aplicación de autenticación
+        </p>
+    </div>
+{% endif %}
+
+<form method="post" action="">
+    {% csrf_token %}
+    {{ wizard.management_form }}
+    
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger mb-3">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+    
+    <div class="mb-4">
+        <label for="{{ form.token.id_for_label }}" class="form-label">
+            <i class="fas fa-key me-1"></i>Código de Verificación
+        </label>
+        {{ form.token }}
+        {% if form.token.errors %}
+            <div class="text-danger small mt-1">{{ form.token.errors }}</div>
+        {% endif %}
+        <div class="form-text" style="color: #708d81;">
+            Ingresa el código generado por tu aplicación para confirmar la configuración
+        </div>
+    </div>
+    
+    <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fas fa-check me-2"></i>Activar 2FA
+        </button>
+    </div>
+    
+    <div class="text-center">
+        <small style="color: #708d81;">
+            Recomendamos usar Google Authenticator o Authy
+        </small>
+    </div>
+</form>
+{% endblock %}

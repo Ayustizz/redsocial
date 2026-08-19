@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - AM Media</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/am-media.css' %}">
+    <link rel="stylesheet" href="{% static 'css/am-effects.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-am">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">AM Media</a>
+            <div class="navbar-nav mx-auto">
+                <a class="nav-link active" href="{% url 'home' %}"><i class="fas fa-home me-1"></i>Inicio</a>
+                <a class="nav-link" href="{% url 'tendencias' %}"><i class="fas fa-fire me-1"></i>Tendencias</a>
+                <a class="nav-link" href="{% url 'buscar_usuarios' %}"><i class="fas fa-search me-1"></i>Buscar</a>
+                <a class="nav-link" href="{% url 'mis_amigos' %}"><i class="fas fa-users me-1"></i>Amigos</a>
+                <a class="nav-link" href="{% url 'solicitudes_amistad' %}"><i class="fas fa-user-plus me-1"></i>Solicitudes</a>
+                <a class="nav-link" href="{% url 'ver_perfil' user.username %}"><i class="fas fa-user me-1"></i>Mi Perfil</a>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                        {% if user.perfil.foto %}
+                            <img src="{{ user.perfil.foto.url }}" class="rounded-circle me-2" width="32" height="32" alt="Mi avatar">
+                        {% else %}
+                            <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: #001427; color: white; font-weight: bold; font-size: 0.8rem;">
+                                {{ user.username|first|upper }}
+                            </div>
+                        {% endif %}
+                        <span>{{ user.get_full_name|default:user.username }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="{% url 'ver_perfil' user.username %}"><i class="fas fa-user me-2"></i>Mi Perfil</a></li>
+                        <li><a class="dropdown-item" href="{% url 'editar_perfil' %}"><i class="fas fa-edit me-2"></i>Editar Perfil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-xl-6">
+                    <div class="card card-am mb-4 fade-in-up hover-lift">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                {% if user.perfil.foto %}
+                                    <img src="{{ user.perfil.foto.url }}" class="rounded-circle me-3" width="48" height="48" alt="Mi avatar">
+                                {% else %}
+                                    <div class="rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; background: #001427; color: white; font-weight: bold;">
+                                        {{ user.username|first|upper }}
+                                    </div>
+                                {% endif %}
+                                <h6 class="mb-0">¿Qué estás pensando, {{ user.first_name|default:user.username }}?</h6>
+                            </div>
+                            <form method="post" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    {{ form.contenido }}
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="flex-grow-1 me-3">
+                                        {{ form.imagen }}
+                                    </div>
+                                    <button type="submit" class="btn btn-am-primary">
+                                        <i class="fas fa-paper-plane me-1"></i>Publicar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+
+                    {% for publicacion in publicaciones %}
+                        <div class="card post-card card-am fade-in-up hover-lift">
+                            <div class="card-body">
+                                <div class="post-header">
+                                    <div class="d-flex align-items-center flex-grow-1">
+                                        {% if publicacion.autor.perfil.foto %}
+                                            <img src="{{ publicacion.autor.perfil.foto.url }}" class="avatar avatar-am" alt="Avatar">
+                                        {% else %}
+                                            <div class="avatar-placeholder avatar-am">
+                                                {{ publicacion.autor.username|first|upper }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="ms-3">
+                                            <h6 class="mb-0">
+                                                <a href="{% url 'ver_perfil' publicacion.autor.username %}" class="post-author">
+                                                    {{ publicacion.autor.get_full_name|default:publicacion.autor.username }}
+                                                </a>
+                                                {% if publicacion.es_compartida %}
+                                                    <small class="text-muted"><i class="fas fa-share ms-2 me-1"></i>compartió</small>
+                                                {% endif %}
+                                            </h6>
+                                            <small class="post-time"><i class="fas fa-clock me-1"></i>{{ publicacion.fecha_creacion }}</small>
+                                        </div>
+                                    </div>
+                                    {% if publicacion.autor == user %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="{% url 'editar_publicacion' publicacion.id %}"><i class="fas fa-edit me-1"></i>Editar</a></li>
+                                                <li><a class="dropdown-item text-danger" href="{% url 'eliminar_publicacion' publicacion.id %}"><i class="fas fa-trash me-1"></i>Eliminar</a></li>
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if publicacion.contenido %}
+                                    <p class="post-content">{{ publicacion.contenido }}</p>
+                                {% endif %}
+                                
+                                {% if publicacion.es_compartida and publicacion.publicacion_compartida %}
+                                    <!-- Publicación compartida -->
+                                    <div class="card mt-3" style="background: #f8f9fa; border-left: 4px solid var(--primary-light);">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-2">
+                                                {% if publicacion.publicacion_compartida.autor.perfil.foto %}
+                                                    <img src="{{ publicacion.publicacion_compartida.autor.perfil.foto.url }}" class="rounded-circle me-2" width="32" height="32">
+                                                {% else %}
+                                                    <div class="rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; background: var(--primary-color); color: white; font-weight: bold; font-size: 0.8rem;">
+                                                        {{ publicacion.publicacion_compartida.autor.username|first|upper }}
+                                                    </div>
+                                                {% endif %}
+                                                <div>
+                                                    <h6 class="mb-0">
+                                                        <a href="{% url 'ver_perfil' publicacion.publicacion_compartida.autor.username %}" class="text-decoration-none">
+                                                            {{ publicacion.publicacion_compartida.autor.get_full_name|default:publicacion.publicacion_compartida.autor.username }}
+                                                        </a>
+                                                    </h6>
+                                                    <small class="text-muted">{{ publicacion.publicacion_compartida.fecha_creacion }}</small>
+                                                </div>
+                                            </div>
+                                            <p class="mb-2">{{ publicacion.publicacion_compartida.contenido }}</p>
+                                            {% if publicacion.publicacion_compartida.imagen %}
+                                                <img src="{{ publicacion.publicacion_compartida.imagen.url }}" class="img-fluid rounded" alt="Imagen">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    {% if publicacion.imagen %}
+                                        <img src="{{ publicacion.imagen.url }}" class="post-image img-fluid" alt="Imagen de publicación">
+                                    {% endif %}
+                                {% endif %}
+                                
+                                <div class="post-actions">
+                                    <div class="d-flex gap-2">
+                                        <button class="reaction-btn like-btn" data-post-id="{{ publicacion.id }}" data-liked="{% if publicacion.reacciones.all|length > 0 %}{% for reaccion in publicacion.reacciones.all %}{% if reaccion.usuario == user %}true{% endif %}{% endfor %}{% else %}false{% endif %}">
+                                            <i class="fas fa-heart{% if publicacion.reacciones.all|length > 0 %}{% for reaccion in publicacion.reacciones.all %}{% if reaccion.usuario == user %} text-danger{% endif %}{% endfor %}{% endif %}"></i> 
+                                            <span class="like-count">{{ publicacion.reacciones.count }}</span>
+                                        </button>
+                                        {% if publicacion.autor != user %}
+                                            <a href="{% url 'compartir_publicacion' publicacion.id %}" class="reaction-btn">
+                                                <i class="fas fa-share"></i> Compartir
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-muted"><i class="fas fa-comment me-1"></i>{{ publicacion.comentarios.count }} comentarios</small>
+                                </div>
+                                
+    
+                                <div class="comments-section">
+                                    {% for comentario in publicacion.comentarios.all|slice:":3" %}
+                                        <div class="comment">
+                                            {% if comentario.autor.perfil.foto %}
+                                                <img src="{{ comentario.autor.perfil.foto.url }}" class="comment-avatar" alt="Avatar">
+                                            {% else %}
+                                                <div class="comment-avatar" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-weight: bold; font-size: 0.8rem;">
+                                                    {{ comentario.autor.username|first|upper }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="comment-content">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div class="flex-grow-1">
+                                                        <div class="comment-author">{{ comentario.autor.username }}</div>
+                                                        <div class="comment-text" id="comment-text-{{ comentario.id }}">{{ comentario.contenido }}</div>
+                                                        <div class="comment-edit-form" id="edit-form-{{ comentario.id }}" style="display: none;">
+                                                            <form method="post" action="{% url 'editar_comentario' comentario.id %}">
+                                                                {% csrf_token %}
+                                                                <div class="input-group input-group-sm">
+                                                                    <input type="text" class="form-control" name="contenido" value="{{ comentario.contenido }}" required>
+                                                                    <button class="btn btn-outline-success" type="submit">
+                                                                        <i class="fas fa-check"></i>
+                                                                    </button>
+                                                                    <button class="btn btn-outline-secondary" type="button" onclick="cancelEdit({{ comentario.id }})">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                    {% if comentario.autor == user %}
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-sm btn-link text-muted dropdown-toggle" type="button" data-bs-toggle="dropdown" style="border: none; padding: 0.25rem;">
+                                                                <i class="fas fa-ellipsis-h"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                                <li><a class="dropdown-item" href="#" onclick="editComment({{ comentario.id }})">
+                                                                    <i class="fas fa-edit me-2"></i>Editar
+                                                                </a></li>
+                                                                <li><a class="dropdown-item text-danger" href="{% url 'eliminar_comentario' comentario.id %}">
+                                                                    <i class="fas fa-trash me-2"></i>Eliminar
+                                                                </a></li>
+                                                            </ul>
+                                                        </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    
+    
+                                    <form method="post" action="{% url 'agregar_comentario' publicacion.id %}" class="mt-2">
+                                        {% csrf_token %}
+                                        <div class="input-group input-group-sm">
+                                            {{ comentario_form.contenido }}
+                                            <button class="btn btn-outline-secondary" type="submit">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="card fade-in-up">
+                            <div class="card-body text-center">
+                                <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">No hay publicaciones para mostrar.</p>
+                                <p>¡Sé el primero en publicar algo o <a href="{% url 'buscar_usuarios' %}" class="text-decoration-none">busca amigos</a> para ver sus publicaciones!</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+    
+                    {% if publicaciones.has_other_pages %}
+                        <nav aria-label="Paginación">
+                            <ul class="pagination justify-content-center">
+                                {% if publicaciones.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ publicaciones.previous_page_number }}">
+                                            <i class="fas fa-chevron-left me-1"></i>Anterior
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                <li class="page-item active">
+                                    <span class="page-link">{{ publicaciones.number }} de {{ publicaciones.paginator.num_pages }}</span>
+                                </li>
+                                
+                                {% if publicaciones.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ publicaciones.next_page_number }}">
+                                            Siguiente<i class="fas fa-chevron-right ms-1"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Manejar clicks en botones de like
+            document.querySelectorAll('.like-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const postId = this.dataset.postId;
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                    
+                    fetch(`/reaccionar/${postId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: 'tipo=like'
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const icon = this.querySelector('i');
+                        const count = this.querySelector('.like-count');
+                        
+                        if (data.liked) {
+                            icon.classList.add('text-danger');
+                            this.dataset.liked = 'true';
+                        } else {
+                            icon.classList.remove('text-danger');
+                            this.dataset.liked = 'false';
+                        }
+                        
+                        count.textContent = data.total_likes;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            });
+        });
+        
+        // Funciones para editar comentarios
+        function editComment(commentId) {
+            document.getElementById('comment-text-' + commentId).style.display = 'none';
+            document.getElementById('edit-form-' + commentId).style.display = 'block';
+        }
+        
+        function cancelEdit(commentId) {
+            document.getElementById('comment-text-' + commentId).style.display = 'block';
+            document.getElementById('edit-form-' + commentId).style.display = 'none';
+        }
+    </script>
+</body>
+</html>

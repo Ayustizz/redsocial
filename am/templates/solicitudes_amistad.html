@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitudes de Amistad - AM Media</title>
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/am-media.css' %}">
+    <link rel="stylesheet" href="{% static 'css/am-effects.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-am">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">AM Media</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home me-1"></i>Inicio</a>
+                <a class="nav-link" href="{% url 'buscar_usuarios' %}"><i class="fas fa-search me-1"></i>Buscar</a>
+                <a class="nav-link" href="{% url 'mis_amigos' %}"><i class="fas fa-users me-1"></i>Amigos</a>
+                <a class="nav-link active" href="{% url 'solicitudes_amistad' %}"><i class="fas fa-user-plus me-1"></i>Solicitudes</a>
+                <a class="nav-link" href="{% url 'ver_perfil' user.username %}"><i class="fas fa-user me-1"></i>Mi Perfil</a>
+                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card card-am mb-4 fade-in-up">
+                        <div class="card-header">
+                            <h4 class="text-am-gradient mb-0">
+                                <i class="fas fa-user-plus me-2"></i>Solicitudes de Amistad
+                                {% if solicitudes %}
+                                    <span class="badge bg-warning ms-2">{{ solicitudes|length }}</span>
+                                {% endif %}
+                            </h4>
+                        </div>
+                    </div>
+
+                    <!-- Mostrar mensajes -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert {% if message.tags == 'error' %}alert-danger{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %} alert-dismissible fade show fade-in-up" role="alert">
+                                <i class="fas {% if message.tags == 'error' %}fa-exclamation-triangle{% elif message.tags == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if solicitudes %}
+                        {% for solicitud in solicitudes %}
+                            <div class="card card-am mb-3 fade-in-up hover-lift">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        {% if solicitud.usuario_solicitante.perfil.foto %}
+                                            <img src="{{ solicitud.usuario_solicitante.perfil.foto.url }}" class="avatar avatar-am me-3" alt="Avatar de {{ solicitud.usuario_solicitante.username }}">
+                                        {% else %}
+                                            <div class="avatar-placeholder avatar-am me-3">
+                                                {{ solicitud.usuario_solicitante.username|first|upper }}
+                                            </div>
+                                        {% endif %}
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1 fw-bold">{{ solicitud.usuario_solicitante.get_full_name|default:solicitud.usuario_solicitante.username }}</h6>
+                                            <p class="text-muted mb-1">
+                                                <i class="fas fa-at me-1"></i>{{ solicitud.usuario_solicitante.username }}
+                                            </p>
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>Solicitud enviada el {{ solicitud.fecha_solicitud|date:"d/m/Y H:i" }}
+                                            </small>
+                                            {% if solicitud.usuario_solicitante.perfil.biografia %}
+                                                <p class="text-muted small mt-2 mb-0">{{ solicitud.usuario_solicitante.perfil.biografia|truncatechars:100 }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 d-flex gap-2">
+                                        <a href="{% url 'responder_solicitud_amistad' solicitud.id 'aceptar' %}" class="btn btn-success btn-sm flex-fill">
+                                            <i class="fas fa-check me-1"></i>Aceptar
+                                        </a>
+                                        <a href="{% url 'responder_solicitud_amistad' solicitud.id 'rechazar' %}" class="btn btn-danger btn-sm flex-fill">
+                                            <i class="fas fa-times me-1"></i>Rechazar
+                                        </a>
+                                        <a href="{% url 'ver_perfil' solicitud.usuario_solicitante.username %}" class="btn btn-am-accent btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Ver Perfil
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="card card-am fade-in-up">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-user-clock fa-4x text-muted mb-4"></i>
+                                <h5 class="text-muted mb-3">No tienes solicitudes pendientes</h5>
+                                <p class="text-muted mb-4">Cuando alguien te envíe una solicitud de amistad, aparecerá aquí</p>
+                                <a href="{% url 'buscar_usuarios' %}" class="btn btn-am-primary">
+                                    <i class="fas fa-search me-2"></i>Buscar Usuarios
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
